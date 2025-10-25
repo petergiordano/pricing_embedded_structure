@@ -22,6 +22,7 @@ const frequencyPatterns = [
     subtitle: '(Always Present)',
     description: 'The customer\'s need is constant and ongoing.',
     icon: Clock,
+    recommendation: 'Subscription'
   },
   {
     id: 'burst_episodic',
@@ -29,13 +30,15 @@ const frequencyPatterns = [
     subtitle: '(Intense Periods)',
     description: 'The need spikes during specific events or cycles.',
     icon: Zap,
+    recommendation: 'Usage-Based'
   },
   {
     id: 'project_oriented',
-    title: 'Project-Oriented Problems',
+    title: 'Project-based Problems',
     subtitle: '(Defined Beginning/End)',
     description: 'The need is for a solution for a distinct task or limited time frame.',
     icon: Target,
+    recommendation: 'Usage-Based'
   }
 ];
 
@@ -45,18 +48,21 @@ const criticalityPatterns = [
     title: 'Mission-Critical / Revenue-Protecting',
     description: 'Directly impacts revenue, prevents significant losses, or enables core business functions.',
     icon: Shield,
+    recommendation: 'Outcome-Based'
   },
   {
     id: 'efficiency',
     title: 'Efficiency / Productivity Enhancing',
-    description: 'Improves workflows, saves time, or reduces operational costs.',
+    description: 'Improves workflows, saves time, or reduces operational costs for teams and users.',
     icon: Settings,
+    recommendation: 'Simple Tiers'
   },
   {
     id: 'nice_to_have',
     title: 'Nice-to-Have / Strategic Enhancement',
-    description: 'Provides additional benefits, improves experience, or supports future strategy but isn\'t immediately critical.',
+    description: 'Provides additional benefits, improves experience, or supports future business strategy.',
     icon: Heart,
+    recommendation: 'Transparent'
   }
 ];
 
@@ -142,16 +148,16 @@ export function PricingCalculator() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4" style={{ gridAutoRows: '1fr' }}>
             {frequencyPatterns.map((pattern) => {
               const Icon = pattern.icon;
               const isSelected = state.frequencyPattern === pattern.id;
-              
+
               return (
                 <button
                   key={pattern.id}
                   onClick={() => setState(prev => ({ ...prev, frequencyPattern: pattern.id }))}
-                  className={`p-5 rounded-xl border text-left transition-all hover:shadow-md ${
+                  className={`p-5 rounded-xl border text-left transition-all hover:shadow-md h-full ${
                     isSelected
                       ? 'shadow-md'
                       : 'bg-white hover:shadow-sm'
@@ -161,14 +167,30 @@ export function PricingCalculator() {
                     backgroundColor: isSelected ? '#e5ecea' : 'white'
                   }}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <Icon className={`w-5 h-5 ${isSelected ? '' : 'text-slate-500'}`} style={isSelected ? { color: '#224f41' } : {}} />
+                  <div className="flex flex-col h-full justify-between">
                     <div>
-                      <div className="font-medium text-slate-700">{pattern.title}</div>
-                      <div className="text-sm text-slate-500">{pattern.subtitle}</div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <Icon className={`w-5 h-5 ${isSelected ? '' : 'text-slate-500'}`} style={isSelected ? { color: '#224f41' } : {}} />
+                        <div>
+                          <div className="font-medium text-slate-700">{pattern.title}</div>
+                          <div className="text-sm text-slate-500">{pattern.subtitle}</div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-slate-600 mb-3">{pattern.description}</p>
+                    </div>
+                    <div>
+                      <Badge
+                        className="text-xs whitespace-nowrap"
+                        style={{
+                          backgroundColor: isSelected ? '#224f41' : '#e5ecea',
+                          color: isSelected ? 'white' : '#224f41',
+                          display: 'inline-block'
+                        }}
+                      >
+                        Consider → {pattern.recommendation}
+                      </Badge>
                     </div>
                   </div>
-                  <p className="text-sm text-slate-600">{pattern.description}</p>
                 </button>
               );
             })}
@@ -188,16 +210,16 @@ export function PricingCalculator() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4" style={{ gridAutoRows: '1fr' }}>
             {criticalityPatterns.map((pattern) => {
               const Icon = pattern.icon;
               const isSelected = state.criticalityPattern === pattern.id;
-              
+
               return (
                 <button
                   key={pattern.id}
                   onClick={() => setState(prev => ({ ...prev, criticalityPattern: pattern.id }))}
-                  className={`p-5 rounded-xl border text-left transition-all hover:shadow-md ${
+                  className={`p-5 rounded-xl border text-left transition-all hover:shadow-md h-full ${
                     isSelected
                       ? 'shadow-md'
                       : 'bg-white hover:shadow-sm'
@@ -207,11 +229,27 @@ export function PricingCalculator() {
                     backgroundColor: isSelected ? '#e5ecea' : 'white'
                   }}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <Icon className={`w-5 h-5 ${isSelected ? '' : 'text-slate-500'}`} style={isSelected ? { color: '#224f41' } : {}} />
-                    <div className="font-medium text-slate-700">{pattern.title}</div>
+                  <div className="flex flex-col h-full justify-between">
+                    <div>
+                      <div className="flex items-center gap-3 mb-3">
+                        <Icon className={`w-5 h-5 ${isSelected ? '' : 'text-slate-500'}`} style={isSelected ? { color: '#224f41' } : {}} />
+                        <div className="font-medium text-slate-700">{pattern.title}</div>
+                      </div>
+                      <p className="text-sm text-slate-600 mb-3">{pattern.description}</p>
+                    </div>
+                    <div>
+                      <Badge
+                        className="text-xs whitespace-nowrap"
+                        style={{
+                          backgroundColor: isSelected ? '#224f41' : '#e5ecea',
+                          color: isSelected ? 'white' : '#224f41',
+                          display: 'inline-block'
+                        }}
+                      >
+                        Consider → {pattern.recommendation}
+                      </Badge>
+                    </div>
                   </div>
-                  <p className="text-sm text-slate-600">{pattern.description}</p>
                 </button>
               );
             })}
