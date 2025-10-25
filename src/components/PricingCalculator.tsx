@@ -10,8 +10,7 @@ interface CalculatorState {
 }
 
 interface PricingRecommendation {
-  primaryModel: string;
-  secondaryModel?: string;
+  coreArchitecture: string;
   reasoning: string;
   examples: string[];
 }
@@ -19,111 +18,93 @@ interface PricingRecommendation {
 const frequencyPatterns = [
   {
     id: 'continuous',
-    title: 'Continuous',
-    subtitle: 'always present',
-    description: 'Your solution is used regularly and consistently',
+    title: 'Continuous Problems',
+    subtitle: '(Always Present)',
+    description: 'The customer\'s need is constant and ongoing.',
     icon: Clock,
-    recommendation: 'Subscription'
   },
   {
-    id: 'burst',
-    title: 'Burst',
-    subtitle: 'intense periods',
-    description: 'Usage comes in waves or specific time periods',
+    id: 'burst_episodic',
+    title: 'Burst / Episodic Problems',
+    subtitle: '(Intense Periods)',
+    description: 'The need spikes during specific events or cycles.',
     icon: Zap,
-    recommendation: 'Usage-Based'
   },
   {
-    id: 'project',
-    title: 'Project',
-    subtitle: 'one-time fixes',
-    description: 'Discrete projects or one-time implementations',
+    id: 'project_oriented',
+    title: 'Project-Oriented Problems',
+    subtitle: '(Defined Beginning/End)',
+    description: 'The need is for a solution for a distinct task or limited time frame.',
     icon: Target,
-    recommendation: 'Fixed Fee'
   }
 ];
 
 const criticalityPatterns = [
   {
-    id: 'revenue-protecting',
-    title: 'Revenue-Protecting',
-    description: 'Directly impacts customer revenue or prevents losses',
+    id: 'mission_critical',
+    title: 'Mission-Critical / Revenue-Protecting',
+    description: 'Directly impacts revenue, prevents significant losses, or enables core business functions.',
     icon: Shield,
-    recommendation: 'Outcome-Based'
   },
   {
     id: 'efficiency',
-    title: 'Efficiency',
-    description: 'Improves operational efficiency or productivity',
+    title: 'Efficiency / Productivity Enhancing',
+    description: 'Improves workflows, saves time, or reduces operational costs.',
     icon: Settings,
-    recommendation: 'Simple Tiers'
   },
   {
-    id: 'nice-to-have',
-    title: 'Nice-to-Have',
-    description: 'Enhances experience but not mission-critical',
+    id: 'nice_to_have',
+    title: 'Nice-to-Have / Strategic Enhancement',
+    description: 'Provides additional benefits, improves experience, or supports future strategy but isn\'t immediately critical.',
     icon: Heart,
-    recommendation: 'Transparent'
   }
 ];
 
-function generateRecommendation(frequency: string, criticality: string): PricingRecommendation {
-  const freqPattern = frequencyPatterns.find(p => p.id === frequency);
-  const critPattern = criticalityPatterns.find(p => p.id === criticality);
-  
-  if (!freqPattern || !critPattern) {
-    return {
-      primaryModel: 'Mixed Model',
-      reasoning: 'Please select both patterns to get a recommendation.',
-      examples: []
-    };
+function generateRecommendation(frequencyId: string, criticalityId: string): PricingRecommendation {
+  let coreArchitecture: string = '';
+  let reasoning: string = '';
+  let examples: string[] = [];
+
+  // --- Logic Mapping ---
+
+  if (criticalityId === 'mission_critical') {
+    if (frequencyId === 'continuous') {
+      coreArchitecture = 'Primarily Subscription-driven';
+      reasoning = 'Continuous, mission-critical problems often align with a core Subscription Model to ensure stable, always-on access for critical functions. This allows for predictable budgeting, with potential for outcome-based add-ons or premium tiers to reflect direct impact and value.';
+      examples = ['Enterprise Security Platforms', 'Core Infrastructure Monitoring', 'Compliance Management SaaS', 'Financial Risk Management'];
+    } else if (frequencyId === 'burst_episodic') {
+      coreArchitecture = 'Primarily Usage-driven';
+      reasoning = 'Burst/episodic mission-critical problems are well-suited for a Usage-Based Model. This ensures customers pay for value delivered during intense periods, offering scalability and fairness. This can include a base subscription with performance-based components.';
+      examples = ['AI Fraud Detection (per transaction)', 'Incident Response Automation (per event)', 'Real-time Threat Intelligence (per query/alert)', 'API Rate Limit Management'];
+    } else if (frequencyId === 'project_oriented') {
+      coreArchitecture = 'Primarily Outcome-driven Potential';
+      reasoning = 'For project-oriented problems with mission-critical outcomes, an Outcome-driven approach can be powerful, tying pricing directly to results. This often includes a base subscription for access and support, with performance-based components for actual outcomes achieved.';
+      examples = ['AI Sales Prospecting (per qualified lead)', 'Automated Legal Review (per successful case)', 'AI-powered A/B Testing (per conversion lift)', 'Security Vulnerability Remediation (per fixed vulnerability)'];
+    }
+  } else if (criticalityId === 'efficiency') {
+    if (frequencyId === 'continuous') {
+      coreArchitecture = 'Primarily Subscription-driven';
+      reasoning = 'Continuous efficiency-enhancing problems are best served by a core Subscription Model, providing ongoing access to tools that consistently improve workflows, automate tasks, and save time for users.';
+      examples = ['Team Collaboration Software', 'Project Management Tools', 'CRM Automation', 'Cloud-based IDEs'];
+    } else if (frequencyId === 'burst_episodic') {
+      coreArchitecture = 'Primarily Usage-driven';
+      reasoning = 'Burst/episodic problems focused on efficiency gain significantly from a Usage-Based Model. Customers pay for the specific resources consumed or operations performed during periods of high activity, ensuring costs align directly with efficiency delivered.';
+      examples = ['Cloud Rendering Services (per hour/compute unit)', 'Data Enrichment APIs (per lookup)', 'AI Code Generation (per suggestion/lines of code)', 'Automated Data Transformation (per GB processed)'];
+    } else if (frequencyId === 'project_oriented') {
+      coreArchitecture = 'Primarily Usage-driven';
+      reasoning = 'Even project-oriented efficiency problems in B2B SaaS typically resolve into a Usage-Based Model for resources consumed (e.g., specific reports, processing cycles) or a Time-Based Subscription for access during the project duration, avoiding non-recurring "fixed fees."';
+      examples = ['AI Document Analysis (per document processed)', 'Automated Report Generation (per report)', 'Custom AI Model Training (per compute hour)', 'Data Migration Tools (per GB/record)'];
+    }
+  } else if (criticalityId === 'nice_to_have') {
+    // Nice-to-have problems often need a low barrier to entry, leaning towards subscription for accessibility
+    coreArchitecture = 'Primarily Subscription-driven';
+    reasoning = 'For "nice-to-have" features, regardless of frequency, a simple, accessible Subscription Model (often with freemium or lower tiers) is crucial to drive adoption and prove value. Upselling to higher tiers can occur as perceived value grows and importance increases.';
+    examples = ['Personal Productivity Apps', 'Advanced Analytics Dashboards (add-on)', 'Browser Extensions for niche functionality', 'AI Writing Assistants (basic tiers)'];
   }
 
-  // Determine primary model based on frequency pattern
-  let primaryModel = freqPattern.recommendation;
-  let secondaryModel = critPattern.recommendation;
-  
-  // Generate reasoning
-  let reasoning = `Based on your ${freqPattern.title.toLowerCase()} usage pattern and ${critPattern.title.toLowerCase()} criticality, `;
-  
-  if (frequency === 'continuous' && criticality === 'revenue-protecting') {
-    reasoning += 'a subscription model with outcome-based components would work best. Consider tiered subscriptions with revenue guarantees.';
-    examples: ['SaaS with uptime SLAs', 'Managed security services', 'Business insurance'];
-  } else if (frequency === 'burst' && criticality === 'efficiency') {
-    reasoning += 'usage-based pricing with simple tiers provides the best alignment. Customers pay for what they use during peak periods.';
-    examples: ['Cloud computing', 'CDN services', 'Seasonal consulting'];
-  } else if (frequency === 'project' && criticality === 'nice-to-have') {
-    reasoning += 'transparent fixed-fee pricing works well. Clear scope and deliverables with upfront pricing.';
-    examples: ['Website design', 'Marketing campaigns', 'Training workshops'];
-  } else {
-    reasoning += `${primaryModel.toLowerCase()} pricing aligns with your usage pattern, while incorporating ${secondaryModel.toLowerCase()} elements addresses your criticality level.`;
-  }
-
-  const examples = getExamples(frequency, criticality);
-
-  return {
-    primaryModel,
-    secondaryModel: secondaryModel !== primaryModel ? secondaryModel : undefined,
-    reasoning,
-    examples
-  };
+  return { coreArchitecture, reasoning, examples };
 }
 
-function getExamples(frequency: string, criticality: string): string[] {
-  const exampleMap: Record<string, string[]> = {
-    'continuous-revenue-protecting': ['Salesforce CRM', 'Stripe payments', 'AWS hosting'],
-    'continuous-efficiency': ['Slack', 'Notion', 'Adobe Creative Suite'],
-    'continuous-nice-to-have': ['Spotify', 'Netflix', 'Figma'],
-    'burst-revenue-protecting': ['Cyber security incident response', 'Legal services', 'Emergency maintenance'],
-    'burst-efficiency': ['Cloud computing', 'Seasonal staffing', 'Campaign management'],
-    'burst-nice-to-have': ['Event planning', 'Photography services', 'Travel booking'],
-    'project-revenue-protecting': ['Business transformation', 'Compliance audits', 'System integration'],
-    'project-efficiency': ['Process optimization', 'Training programs', 'Tool implementation'],
-    'project-nice-to-have': ['Brand design', 'Website redesign', 'Content creation']
-  };
-  
-  return exampleMap[`${frequency}-${criticality}`] || ['Custom solution', 'Industry-specific pricing', 'Hybrid model'];
-}
 
 export function PricingCalculator() {
   const [state, setState] = useState<CalculatorState>({
@@ -143,8 +124,8 @@ export function PricingCalculator() {
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
-        <div className="p-8 rounded-2xl border border-gray-200 shadow-sm" style={{ backgroundColor: '#E1E8E6' }}>
-          <h1 className="text-4xl mb-3" style={{ color: '#234F41' }}>Pattern Recognition Framework</h1>
+        <div className="p-8 rounded-2xl" style={{ backgroundColor: '#e5ecea' }}>
+          <h1 className="text-4xl mb-3" style={{ color: '#224f41' }}>Pattern Recognition Framework</h1>
           <p className="text-slate-600">The nature of your problem dictates your pricing model</p>
         </div>
       </div>
@@ -152,12 +133,12 @@ export function PricingCalculator() {
       {/* Frequency Pattern Selection */}
       <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2" style={{ color: '#234F41' }}>
+          <CardTitle className="flex items-center gap-2" style={{ color: '#224f41' }}>
             <Clock className="w-5 h-5 text-slate-600" />
-            Frequency Pattern
+            Frequency & Continuity
           </CardTitle>
           <CardDescription className="text-slate-600">
-            How often do your customers use or need your solution?
+            How often do customers experience the problem and need your solution?
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -171,27 +152,23 @@ export function PricingCalculator() {
                   key={pattern.id}
                   onClick={() => setState(prev => ({ ...prev, frequencyPattern: pattern.id }))}
                   className={`p-5 rounded-xl border text-left transition-all hover:shadow-md ${
-                    isSelected 
-                      ? 'bg-emerald-50 shadow-md' 
+                    isSelected
+                      ? 'shadow-md'
                       : 'bg-white hover:shadow-sm'
                   }`}
-                  style={{ borderColor: '#234F41' }}
+                  style={{
+                    borderColor: '#224f41',
+                    backgroundColor: isSelected ? '#e5ecea' : 'white'
+                  }}
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <Icon className={`w-5 h-5 ${isSelected ? 'text-emerald-600' : 'text-slate-500'}`} />
+                    <Icon className={`w-5 h-5 ${isSelected ? '' : 'text-slate-500'}`} style={isSelected ? { color: '#224f41' } : {}} />
                     <div>
                       <div className="font-medium text-slate-700">{pattern.title}</div>
-                      <div className="text-sm text-slate-500">({pattern.subtitle})</div>
+                      <div className="text-sm text-slate-500">{pattern.subtitle}</div>
                     </div>
                   </div>
-                  <p className="text-sm text-slate-600 mb-3">{pattern.description}</p>
-                  <Badge 
-                    variant={isSelected ? "default" : "secondary"} 
-                    className={`text-xs ${isSelected ? 'bg-emerald-600 text-white' : 'text-slate-600'}`}
-                    style={!isSelected ? { backgroundColor: '#E1E8E6' } : {}}
-                  >
-                    Consider → {pattern.recommendation}
-                  </Badge>
+                  <p className="text-sm text-slate-600">{pattern.description}</p>
                 </button>
               );
             })}
@@ -202,12 +179,12 @@ export function PricingCalculator() {
       {/* Criticality Pattern Selection */}
       <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2" style={{ color: '#234F41' }}>
+          <CardTitle className="flex items-center gap-2" style={{ color: '#224f41' }}>
             <Target className="w-5 h-5 text-slate-600" />
-            Criticality Pattern
+            Criticality & Impact
           </CardTitle>
           <CardDescription className="text-slate-600">
-            How critical is your solution to your customers' success?
+            How vital is your solution to your customers' success and operations?
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -221,24 +198,20 @@ export function PricingCalculator() {
                   key={pattern.id}
                   onClick={() => setState(prev => ({ ...prev, criticalityPattern: pattern.id }))}
                   className={`p-5 rounded-xl border text-left transition-all hover:shadow-md ${
-                    isSelected 
-                      ? 'bg-orange-50 shadow-md' 
+                    isSelected
+                      ? 'shadow-md'
                       : 'bg-white hover:shadow-sm'
                   }`}
-                  style={{ borderColor: '#234F41' }}
+                  style={{
+                    borderColor: '#224f41',
+                    backgroundColor: isSelected ? '#e5ecea' : 'white'
+                  }}
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <Icon className={`w-5 h-5 ${isSelected ? 'text-orange-500' : 'text-slate-500'}`} />
+                    <Icon className={`w-5 h-5 ${isSelected ? '' : 'text-slate-500'}`} style={isSelected ? { color: '#224f41' } : {}} />
                     <div className="font-medium text-slate-700">{pattern.title}</div>
                   </div>
-                  <p className="text-sm text-slate-600 mb-3">{pattern.description}</p>
-                  <Badge 
-                    variant={isSelected ? "destructive" : "secondary"} 
-                    className={`text-xs ${isSelected ? 'bg-orange-500 text-white' : 'text-slate-600'}`}
-                    style={!isSelected ? { backgroundColor: '#E1E8E6' } : {}}
-                  >
-                    Consider → {pattern.recommendation}
-                  </Badge>
+                  <p className="text-sm text-slate-600">{pattern.description}</p>
                 </button>
               );
             })}
@@ -248,41 +221,41 @@ export function PricingCalculator() {
 
       {/* Results */}
       {recommendation && (
-        <Card className="border-emerald-200 bg-emerald-50 rounded-2xl shadow-sm">
+        <Card className="rounded-2xl shadow-sm" style={{ borderColor: '#7da399', backgroundColor: '#e5ecea' }}>
           <CardHeader className="pb-4">
-            <CardTitle style={{ color: '#234F41' }}>Your Pricing Recommendation</CardTitle>
+            <CardTitle style={{ color: '#224f41' }}>Recommended Core Pricing Architecture</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="flex flex-wrap gap-2">
-              <Badge className="bg-emerald-600 text-white px-4 py-2 text-sm">
-                Primary: {recommendation.primaryModel}
+              <Badge className="text-white px-4 py-2 text-sm" style={{ backgroundColor: '#224f41' }}>
+                {recommendation.coreArchitecture}
               </Badge>
-              {recommendation.secondaryModel && (
-                <Badge variant="outline" className="border-emerald-600 text-emerald-700 px-4 py-2 text-sm bg-white">
-                  Secondary: {recommendation.secondaryModel}
-                </Badge>
-              )}
             </div>
-            
+
             <p className="text-slate-700 leading-relaxed">{recommendation.reasoning}</p>
-            
+
             {recommendation.examples.length > 0 && (
               <div>
-                <h4 className="font-medium mb-3" style={{ color: '#234F41' }}>Similar Examples:</h4>
+                <h4 className="font-medium mb-3" style={{ color: '#224f41' }}>Similar Examples:</h4>
                 <div className="flex flex-wrap gap-2">
                   {recommendation.examples.map((example, index) => (
-                    <Badge key={index} variant="outline" className="text-slate-600 border-slate-300 bg-white px-3 py-1">
+                    <Badge key={index} variant="outline" className="text-slate-600 bg-white px-3 py-1" style={{ borderColor: '#7da399' }}>
                       {example}
                     </Badge>
                   ))}
                 </div>
               </div>
             )}
-            
-            <Button 
+
+            <p className="mt-4 text-gray-700">
+              Now that you've identified your core architecture, proceed to Layer 2 to determine the specific Value Metric.
+            </p>
+
+            <Button
               onClick={resetCalculator}
-              variant="outline" 
-              className="border-emerald-600 text-emerald-700 hover:bg-emerald-100 bg-white"
+              variant="outline"
+              className="bg-white hover:bg-opacity-90"
+              style={{ borderColor: '#224f41', color: '#224f41' }}
             >
               Try Another Scenario
             </Button>
@@ -293,9 +266,18 @@ export function PricingCalculator() {
       {/* Progress indicator */}
       <div className="flex justify-center">
         <div className="flex gap-3">
-          <div className={`w-3 h-3 rounded-full transition-colors ${state.frequencyPattern ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-          <div className={`w-3 h-3 rounded-full transition-colors ${state.criticalityPattern ? 'bg-orange-400' : 'bg-gray-300'}`} />
-          <div className={`w-3 h-3 rounded-full transition-colors ${recommendation ? 'bg-slate-600' : 'bg-gray-300'}`} />
+          <div
+            className="w-3 h-3 rounded-full transition-colors"
+            style={{ backgroundColor: state.frequencyPattern ? '#224f41' : '#d1d5db' }}
+          />
+          <div
+            className="w-3 h-3 rounded-full transition-colors"
+            style={{ backgroundColor: state.criticalityPattern ? '#e5a819' : '#d1d5db' }}
+          />
+          <div
+            className="w-3 h-3 rounded-full transition-colors"
+            style={{ backgroundColor: recommendation ? '#0d71a9' : '#d1d5db' }}
+          />
         </div>
       </div>
     </div>
